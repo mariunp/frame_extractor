@@ -97,14 +97,18 @@ def get_videos(parsed_data: dict, parsed_teams: list, frames_dir: str):
             print(vids_msg.ljust(100), end="\r", flush=True)
 
             # being nice to the servers
+            time.sleep(0.3)
             try:
-                # use ffmpeg to grab 1 frame a second from stream
+                # use ffmpeg to grab 1 frame a second,
+                # from the best quality stream
+                input_stream = ffmpeg.input(url)
+                best_qual_stream = input_stream[str(hihgest_qual)]
                 (
-                    ffmpeg.input(url)
-                    .filter("fps", fps=1)
-                    .output(str(output_path), **{"map": f"0:{hihgest_qual}", "q:v": 2})
+                    best_qual_stream.filter("fps", fps=1)
+                    .output(str(output_path), **{"q:v": 2})
                     .run(quiet=True, overwrite_output=True)
                 )
+
             except ffmpeg.Error as e:
                 print(e.stderr)
         print()
